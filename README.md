@@ -5,21 +5,21 @@ Temática: Soporte Técnico Profesional
 Este proyecto consiste en implementar un formulario de contacto interactivo, permitiendo a los usuarios ingresar sus datos personales, de modo que estos datos serán enviados a un endpoint API local mediante una solicitud HTTP POST
 
 ## Integrantes
-Laines Cupul Evelin Yasmin - 22394139@utcancun.edu.mx
-Medrano Cordova Edgar - 
+- Laines Cupul Evelin Yasmin - 22394139@utcancun.edu.mx
+- Medrano Cordova Edgar - 
 
-# La aplicación está desarrollada con las siguientes herramientas: 
-FRONTEND
-React: biblioteca de JavaScript para construir las interfaces del usuario
-CSS: para el diseño personalizado y responsivo
+# Herramientas utilizadas: 
+## FRONTEND
+- React: biblioteca de JavaScript para construir las interfaces del usuario
+- CSS: para el diseño personalizado y responsivo
 
-BACKEND
-Node.Js: es el entorno de ejecución para JavaScript en el servidor
+## BACKEND
+- Node.Js: es el entorno de ejecución para JavaScript en el servidor
 
 BD:
-Mysql: sistema de gestión de bases de datos relacionales, permitiendo almacenar los datos del formulario
+- Mysql: sistema de gestión de bases de datos relacionales, permitiendo almacenar los datos del formulario
 
-### Pasos para correr el proyecto 
+# Pasos para correr el proyecto 
 
 ## Frontend
 Clonar el repositorio
