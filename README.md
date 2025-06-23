@@ -6,7 +6,7 @@ Este proyecto consiste en implementar un formulario de contacto interactivo, per
 
 ## Integrantes
 - Laines Cupul Evelin Yasmin - 22394139@utcancun.edu.mx
-- Medrano Cordova Edgar - 
+- Medrano Cordova Edgar - 22393268@utcancun.edu.mx
 
 # Herramientas utilizadas: 
 ## FRONTEND
