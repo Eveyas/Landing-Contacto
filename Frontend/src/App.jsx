@@ -1,13 +1,16 @@
 import React from 'react';
-import ContactForm from './components/ContactForm';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Landing from './components/Landing';
+import Terminos from './components/Terminos';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <Landing />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+      </Routes>
+    </Router>
   );
 }
 

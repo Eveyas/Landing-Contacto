@@ -196,3 +196,39 @@
   font-weight: bold;
   color: #333;
 }
+
+/* Estilos para términos y reCAPTCHA */
+.terms-container {
+  margin: 15px 0;
+  font-size: 0.9rem;
+}
+
+.terms-container label {
+  display: flex;
+  align-items: center;
+  color: #cbd5e1;
+}
+
+.terms-container a {
+  color: #60a5fa;
+  margin-left: 5px;
+  text-decoration: none;
+}
+
+.terms-container a:hover {
+  text-decoration: underline;
+}
+
+/* Ajustes para reCAPTCHA */
+.g-recaptcha {
+  display: flex;
+  justify-content: center;
+  transform: scale(0.85);
+  transform-origin: 0 0;
+}
+
+@media (max-width: 768px) {
+  .g-recaptcha {
+    transform: scale(0.9);
+  }
+}
