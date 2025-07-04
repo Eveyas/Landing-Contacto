@@ -125,7 +125,7 @@ const ContactForm = () => {
         return;
       }
 
-      // Enviar datos al backend
+      // Envio de datos al backend
       const res = await axios.post('http://localhost:3000/api/contact', {
         ...form,
         recaptchaResponse: recaptchaValue
@@ -142,7 +142,7 @@ const ContactForm = () => {
         aceptaTerminos: false 
       });
       
-      // Resetear reCAPTCHA
+      // Reseteo de reCAPTCHA
       window.grecaptcha.reset(recaptchaWidgetId.current);
       
       timerRef.current = setTimeout(() => {

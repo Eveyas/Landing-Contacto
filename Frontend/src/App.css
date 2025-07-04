@@ -439,3 +439,32 @@ body {
     margin-bottom: 1rem;
   }
 }
+
+
+/* Estilo para los botones */
+.hero-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* Botón específico para admin */
+.hero-button.admin-button {
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+}
+
+.hero-button.admin-button:hover {
+  background: linear-gradient(90deg, #4338ca, #6d28d9);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(109, 40, 217, 0.6);
+}
+@media (max-width: 768px) {
+  .hero-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .hero-button, .hero-button.admin-button {
+    width: 100%;
+  }
+}

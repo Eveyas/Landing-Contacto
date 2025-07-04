@@ -1,12 +1,19 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ContactForm from './ContactForm';
 
 const Landing = () => {
+  const navigate = useNavigate();
+
   const scrollToForm = () => {
     const formSection = document.getElementById('contact-form');
     if (formSection) {
       formSection.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const goToLogin = () => {
+    navigate('/login');
   };
 
   return (
@@ -29,7 +36,15 @@ const Landing = () => {
               <div className="stat-label">Respuesta promedio</div>
             </div>
           </div>
-          <button className="hero-button" onClick={scrollToForm}>👨🏻‍💻 Solicitar Soporte</button>
+          <div className="hero-buttons">
+            <button className="hero-button" onClick={scrollToForm}>👨🏻‍💻 Solicitar Soporte</button>
+            <button 
+              className="hero-button admin-button" 
+              onClick={goToLogin}
+            >
+              🔐 Panel Administrador
+            </button>
+          </div>
         </div>
 
         <div className="hero-illustration">
