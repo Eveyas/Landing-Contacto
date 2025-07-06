@@ -82,8 +82,8 @@ const LoginPage = () => {
     </div>
       <div className="login-image-section">
         <img 
-          src="https://images.pexels.com/photos/7709181/pexels-photo-7709181.jpeg" 
-          alt="Background" 
+          src="https://images.pexels.com/photos/38568/apple-imac-ipad-workplace-38568.jpeg" 
+          alt="login" 
           className="login-image"
         />
         <div className="login-image-overlay"></div>

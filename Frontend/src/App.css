@@ -449,7 +449,6 @@ body {
   margin-top: 20px;
 }
 
-/* Botón específico para admin */
 .hero-button.admin-button {
   background: linear-gradient(90deg, #4f46e5, #7c3aed);
 }

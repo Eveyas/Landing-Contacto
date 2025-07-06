@@ -49,4 +49,29 @@ const updateLeadStatus = async (req, res) => {
   }
 };
 
-module.exports = { getLeads, updateLeadStatus };
+const getStatusCounts = async (req, res) => {
+  try {
+    const [results] = await db.query(`
+      SELECT 
+        SUM(CASE WHEN estado = 'nuevo' THEN 1 ELSE 0 END) AS nuevo,
+        SUM(CASE WHEN estado = 'contactado' THEN 1 ELSE 0 END) AS contactado,
+        SUM(CASE WHEN estado = 'descartado' THEN 1 ELSE 0 END) AS descartado
+      FROM ContacUs
+    `);
+    
+    res.json({
+      nuevo: results[0].nuevo,
+      contactado: results[0].contactado,
+      descartado: results[0].descartado
+    });
+  } catch (error) {
+    console.error('Error al obtener contadores de estado:', error);
+    res.status(500).json({ error: 'Error al obtener estadísticas' });
+  }
+};
+
+module.exports = { 
+  getLeads, 
+  updateLeadStatus,
+  getStatusCounts
+};

@@ -19,6 +19,12 @@ const DashboardPage = () => {
     lastname: '',
     email: ''
   });
+  
+  const [globalStatusCounts, setGlobalStatusCounts] = useState({
+    nuevo: 0,
+    contactado: 0,
+    descartado: 0
+  });
 
   useEffect(() => {
     if (!currentUser) {
@@ -27,7 +33,21 @@ const DashboardPage = () => {
     }
     fetchLeads();
     fetchUserInfo();
+    fetchGlobalStatusCounts();
   }, [pagination.currentPage]);
+
+  const fetchGlobalStatusCounts = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:3000/api/leads/status-counts', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setGlobalStatusCounts(response.data);
+    } catch (error) {
+      console.error('Error fetching global status counts:', error);
+    }
+  };
 
   const fetchLeads = async () => {
     try {
@@ -79,6 +99,8 @@ const DashboardPage = () => {
       setLeads(leads.map(lead => 
         lead.id === leadId ? { ...lead, estado: newStatus } : lead
       ));
+      
+      fetchGlobalStatusCounts();
     } catch (error) {
       console.error('Error updating status:', error);
     }
@@ -104,8 +126,8 @@ const DashboardPage = () => {
         <div className="sidebar-header">
           <div className="user-avatar">
             <img 
-              src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg" 
-              alt="User Avatar" 
+              src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg" 
+              alt="User_Dashboard" 
               className="avatar-image"
             />
             <div className="avatar-overlay"></div>
@@ -122,10 +144,6 @@ const DashboardPage = () => {
               <i className="icon-leads"></i>
               <span>Leads</span>
             </li>
-            {/* <li>
-              <i className="icon-analytics"></i>
-              <span>Analíticas</span>
-            </li> */}
           </ul>
         </nav>
         
@@ -137,7 +155,7 @@ const DashboardPage = () => {
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Contenido */}
       <main className="dashboard-content">
         <header className="dashboard-header">
           <div className="header-center">
@@ -150,10 +168,16 @@ const DashboardPage = () => {
               <span className="stat-label">Leads Totales</span>
             </div>
             <div className="stat-card">
-              <span className="stat-value">
-                {leads.filter(lead => lead.estado === 'nuevo').length}
-              </span>
+              <span className="stat-value">{globalStatusCounts.nuevo}</span>
               <span className="stat-label">Nuevos</span>
+            </div>
+            <div className="stat-card">
+              <span className="stat-value">{globalStatusCounts.contactado}</span>
+              <span className="stat-label">Contactados</span>
+            </div>
+            <div className="stat-card">
+              <span className="stat-value">{globalStatusCounts.descartado}</span>
+              <span className="stat-label">Descartados</span>
             </div>
           </div>
         </header>

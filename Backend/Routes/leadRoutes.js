@@ -5,5 +5,6 @@ const authMiddleware = require('../Middleware/authMiddleware');
 
 router.get('/', authMiddleware, leadController.getLeads);
 router.put('/:id/status', authMiddleware, leadController.updateLeadStatus);
+router.get('/status-counts', authMiddleware, leadController.getStatusCounts);
 
 module.exports = router;
