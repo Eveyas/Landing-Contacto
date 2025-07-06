@@ -48,11 +48,6 @@ async function createUsersTable() {
   }
 }
 
-// Redirección al endpoint
-  app.get('/', (req, res) => {
-  res.send('✅ API corriendo correctamente. Utiliza /api/contact para acceder al endpoint principal');
-});
-
 // Inicia el servidor
 app.listen(port, async () => {
   console.log(`Server is running on port ${port}`)
