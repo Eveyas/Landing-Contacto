@@ -26,23 +26,17 @@ const LoginPage = () => {
     }
   };
 
-  return (
-    <div className="minimal-form-container login-container">
-      <div className="image-circle">
-        <img 
-           src="https://images.pexels.com/photos/7709181/pexels-photo-7709181.jpeg" 
-           alt="Background" 
-        />
-      </div>
-      
-      <form onSubmit={handleSubmit} className="minimal-form login-form">
+   return (
+    <div className="login-container">
+      <div className="login-form-section">
+      <form onSubmit={handleSubmit} className="login-form">
         <h2 className="login-title">
-            Panel de Administración.
-            Ingresa tus credenciales válidas
-        </h2>
+            Panel de Administración
+            <span>Ingresa tus credenciales válidas</span>
+          </h2>
         
-        <div className="input-group">
-          <div className="inputBox">
+        <div className="login-input-group">
+          <div className="login-inputBox">
             <input
               id="username"
               type="text"
@@ -56,8 +50,8 @@ const LoginPage = () => {
           </div>
         </div>
         
-        <div className="input-group">
-          <div className="inputBox">
+        <div className="login-input-group">
+          <div className="login-inputBox">
             <input
               id="password"
               type="password"
@@ -72,19 +66,28 @@ const LoginPage = () => {
         </div>
         
         {error && (
-          <div className="minimal-status error">
+          <div className="login-minimal-status login-error">
             {error}
           </div>
         )}
         
         <button 
           type="submit" 
-          className="enter"
+          className="login-enter"
           disabled={isSubmitting}
         > 
-          {isSubmitting ? 'Ingresando...' : 'Ingresar'} ➤ 
+          {isSubmitting ? 'Ingresando...' : 'Ingresar'} 
         </button>
       </form>
+    </div>
+      <div className="login-image-section">
+        <img 
+          src="https://images.pexels.com/photos/7709181/pexels-photo-7709181.jpeg" 
+          alt="Background" 
+          className="login-image"
+        />
+        <div className="login-image-overlay"></div>
+      </div>
     </div>
   );
 };

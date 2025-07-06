@@ -87,7 +87,7 @@ const Landing = () => {
       <div id="contact-form" className="form-section">
         <div className="form-header">
           <h2 className="section-titleForm">Completa el Formulario</h2>
-            <p style={{ fontWeight: 'bold', fontSize:'1.2rem' }}>Escribe tu problema y nos pondremos en contacto contigo en minutos</p>        
+            <p style={{ fontWeight: 'bold', fontSize:'1.2rem', marginTop: '-20px'}}>Escribe tu problema y nos pondremos en contacto contigo en minutos</p>        
         </div>
         <ContactForm />
       </div>

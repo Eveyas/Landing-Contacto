@@ -247,7 +247,7 @@ body {
   text-align: center;
   font-size: 2.8rem;
   margin-bottom: 3rem;
-  background: linear-gradient(to right, #FFFFFF, #8591a3);
+  background: linear-gradient(to right, #FFFFFF, #8a94a3);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -263,7 +263,7 @@ body {
   background-clip: text;
   color: transparent;
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.6;
 }
 
 .services-grid {
@@ -340,11 +340,12 @@ body {
 .form-header {
   text-align: center;
   max-width: 700px;
-  margin: 0 auto 3rem;
+  margin: -54px auto 3rem;
 }
 
 .form-header .section-title {
   margin-bottom: 1rem;
+  margin-top: '15px';
 }
 
 .form-header p {

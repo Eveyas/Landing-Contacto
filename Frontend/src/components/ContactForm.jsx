@@ -271,10 +271,12 @@ const ContactForm = () => {
         <div 
           ref={recaptchaRef}
           style={{ 
-            margin: '15px 0', 
+            marginTop: '5px 0 10px',
             display: 'flex', 
             justifyContent: 'center',
-            minHeight: '78px'
+            minHeight: '78px',
+            alignSelf: 'flex-start',
+            marginLeft: '5px',
           }}
         ></div>
         
