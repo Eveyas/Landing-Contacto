@@ -48,6 +48,11 @@ async function createUsersTable() {
   }
 }
 
+// Redirección al endpoint
+app.get('/', (req, res) => {
+  res.redirect('/api/contact');
+});
+
 // Inicia el servidor
 app.listen(port, async () => {
   console.log(`Server is running on port ${port}`)
