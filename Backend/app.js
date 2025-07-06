@@ -37,3 +37,10 @@ app.listen(port, () => {
 });
 
 module.exports = app;
+
+// Inicia el servidor
+if (!process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+}
