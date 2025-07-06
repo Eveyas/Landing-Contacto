@@ -49,6 +49,10 @@ async function createUsersTable() {
   }
 }
 
+app.get('/', (req, res) => {
+  res.send('✅ Backend funcionando correctamente en producción');
+});
+
 // Inicia el servidor
 app.listen(port, async () => {
   console.log(`Server is running on port ${port}`)
