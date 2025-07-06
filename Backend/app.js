@@ -49,8 +49,8 @@ async function createUsersTable() {
 }
 
 // Redirección al endpoint
-app.get('/', (req, res) => {
-  res.redirect('/api/contact');
+  app.get('/', (req, res) => {
+  res.send('✅ API corriendo correctamente. Utiliza /api/contact para acceder al endpoint principal');
 });
 
 // Inicia el servidor
