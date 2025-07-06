@@ -50,6 +50,5 @@ async function createUsersTable() {
 
 // Inicia el servidor
 app.listen(port, async () => {
-  console.log(`Server is running on port ${port}`);
-  await createUsersTable();
+  console.log(`Server is running on port ${port}`)
 });
