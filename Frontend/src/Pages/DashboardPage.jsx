@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Authentication/AuthContext';
 import axios from 'axios';
@@ -19,44 +19,21 @@ const DashboardPage = () => {
     lastname: '',
     email: ''
   });
-  
+
   const [globalStatusCounts, setGlobalStatusCounts] = useState({
     nuevo: 0,
     contactado: 0,
     descartado: 0
   });
 
- useEffect(() => {
-  if (!currentUser) {
-    navigate('/login');
-    return;
-  }
-  fetchLeads();
-  fetchUserInfo();
-  fetchGlobalStatusCounts();
-}, [pagination.currentPage, currentUser, fetchLeads, fetchUserInfo, fetchGlobalStatusCounts, navigate]);
-
-  const fetchGlobalStatusCounts = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3000/api/leads/status-counts', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      setGlobalStatusCounts(response.data);
-    } catch (error) {
-      console.error('Error fetching global status counts:', error);
-    }
-  };
-
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       const response = await axios.get(`http://localhost:3000/api/leads?page=${pagination.currentPage}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       setLeads(response.data.leads);
       setPagination({
         currentPage: response.data.pagination.currentPage,
@@ -68,15 +45,15 @@ const DashboardPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.currentPage]);
 
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get('http://localhost:3000/api/auth/user', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       setUserInfo({
         name: response.data.name || 'Administrador',
         lastname: response.data.lastname || '',
@@ -85,7 +62,30 @@ const DashboardPage = () => {
     } catch (error) {
       console.error('Error fetching user info:', error);
     }
-  };
+  }, []);
+
+  const fetchGlobalStatusCounts = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:3000/api/leads/status-counts', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setGlobalStatusCounts(response.data);
+    } catch (error) {
+      console.error('Error fetching global status counts:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+    fetchLeads();
+    fetchUserInfo();
+    fetchGlobalStatusCounts();
+  }, [currentUser, navigate, fetchLeads, fetchUserInfo, fetchGlobalStatusCounts]);
 
   const handleStatusChange = async (leadId, newStatus) => {
     try {
@@ -95,11 +95,11 @@ const DashboardPage = () => {
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      setLeads(leads.map(lead => 
+
+      setLeads(leads.map(lead =>
         lead.id === leadId ? { ...lead, estado: newStatus } : lead
       ));
-      
+
       fetchGlobalStatusCounts();
     } catch (error) {
       console.error('Error updating status:', error);
@@ -125,9 +125,9 @@ const DashboardPage = () => {
       <aside className="dashboard-sidebar">
         <div className="sidebar-header">
           <div className="user-avatar">
-            <img 
-              src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg" 
-              alt="User_Dashboard" 
+            <img
+              src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg"
+              alt="User_Dashboard"
               className="avatar-image"
             />
             <div className="avatar-overlay"></div>
@@ -137,7 +137,7 @@ const DashboardPage = () => {
             <p>{userInfo.email}</p>
           </div>
         </div>
-        
+
         <nav className="sidebar-nav">
           <ul>
             <li className="active">
@@ -146,7 +146,7 @@ const DashboardPage = () => {
             </li>
           </ul>
         </nav>
-        
+
         <div className="sidebar-footer">
           <button onClick={handleLogout} className="logout-btn">
             <i className="icon-logout"></i>
@@ -254,7 +254,7 @@ const DashboardPage = () => {
                   >
                     &lt; Anterior
                   </button>
-                  
+
                   <div className="pagination-numbers">
                     {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
                       <button
@@ -266,7 +266,7 @@ const DashboardPage = () => {
                       </button>
                     ))}
                   </div>
-                  
+
                   <button
                     onClick={() => handlePageChange(pagination.currentPage + 1)}
                     disabled={pagination.currentPage === pagination.totalPages}
