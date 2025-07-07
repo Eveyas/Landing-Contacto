@@ -127,7 +127,7 @@ const ContactForm = () => {
 
       // Envio de datos al backend
       const API_URL = process.env.REACT_APP_API_URL;
-      const res = await axios.post(`${API_URL}/api/contact`, {
+      await axios.post(`${API_URL}/api/contact`, {
         ...form,
         recaptchaResponse: recaptchaValue
       });
