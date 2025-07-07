@@ -26,15 +26,15 @@ const DashboardPage = () => {
     descartado: 0
   });
 
-  useEffect(() => {
-    if (!currentUser) {
-      navigate('/login');
-      return;
-    }
-    fetchLeads();
-    fetchUserInfo();
-    fetchGlobalStatusCounts();
-  }, [pagination.currentPage]);
+ useEffect(() => {
+  if (!currentUser) {
+    navigate('/login');
+    return;
+  }
+  fetchLeads();
+  fetchUserInfo();
+  fetchGlobalStatusCounts();
+}, [pagination.currentPage, currentUser, fetchLeads, fetchUserInfo, fetchGlobalStatusCounts, navigate]);
 
   const fetchGlobalStatusCounts = async () => {
     try {
