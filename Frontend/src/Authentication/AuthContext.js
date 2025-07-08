@@ -4,6 +4,9 @@ import axios from 'axios';
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,13 +18,13 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return;
       }
-      
       try {
-        const response = await axios.get('http://localhost:3000/api/auth/verify', {
+         const response = await axios.get(`${API_URL}/api/auth/verify`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setCurrentUser(response.data.user);
       } catch (error) {
+        console.error('Token inválido o expirado');
         localStorage.removeItem('token');
       }
       setLoading(false);
@@ -31,13 +34,18 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
-    const response = await axios.post('http://localhost:3000/api/auth/login', {
-      username, password
-    });
-    
+     try {
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
+        username,
+        password
+      });
+      
     localStorage.setItem('token', response.data.token);
-    setCurrentUser(response.data.user);
-    return response.data;
+      setCurrentUser(response.data.user);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Error en el inicio de sesión');
+    }
   };
 
   const logout = () => {
@@ -49,7 +57,8 @@ export const AuthProvider = ({ children }) => {
     currentUser,
     login,
     logout,
-    isAuthenticated: !!currentUser
+    isAuthenticated: !!currentUser,
+    loading
   };
 
   return (

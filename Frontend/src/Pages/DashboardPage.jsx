@@ -4,6 +4,8 @@ import { useAuth } from '../Authentication/AuthContext';
 import axios from 'axios';
 import '../styles/dashboard.css';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+
 const DashboardPage = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
@@ -19,7 +21,6 @@ const DashboardPage = () => {
     lastname: '',
     email: ''
   });
-
   const [globalStatusCounts, setGlobalStatusCounts] = useState({
     nuevo: 0,
     contactado: 0,
@@ -30,16 +31,11 @@ const DashboardPage = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/api/leads?page=${pagination.currentPage}`, {
+      const response = await axios.get(`${API_URL}/api/leads?page=${pagination.currentPage}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
       setLeads(response.data.leads);
-      setPagination({
-        currentPage: response.data.pagination.currentPage,
-        totalPages: response.data.pagination.totalPages,
-        totalLeads: response.data.pagination.totalLeads
-      });
+      setPagination(response.data.pagination);
     } catch (error) {
       console.error('Error fetching leads:', error);
     } finally {
@@ -50,10 +46,9 @@ const DashboardPage = () => {
   const fetchUserInfo = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3000/api/auth/user', {
+      const response = await axios.get(`${API_URL}/api/auth/user`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
       setUserInfo({
         name: response.data.name || 'Administrador',
         lastname: response.data.lastname || '',
@@ -67,10 +62,9 @@ const DashboardPage = () => {
   const fetchGlobalStatusCounts = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3000/api/leads/status-counts', {
+      const response = await axios.get(`${API_URL}/api/leads/status-counts`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
       setGlobalStatusCounts(response.data);
     } catch (error) {
       console.error('Error fetching global status counts:', error);
@@ -90,16 +84,13 @@ const DashboardPage = () => {
   const handleStatusChange = async (leadId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(
-        `http://localhost:3000/api/leads/${leadId}/status`,
+      await axios.put(`${API_URL}/api/leads/${leadId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setLeads(leads.map(lead =>
         lead.id === leadId ? { ...lead, estado: newStatus } : lead
       ));
-
       fetchGlobalStatusCounts();
     } catch (error) {
       console.error('Error updating status:', error);
@@ -108,7 +99,7 @@ const DashboardPage = () => {
 
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= pagination.totalPages) {
-      setPagination({ ...pagination, currentPage: newPage });
+      setPagination(prev => ({ ...prev, currentPage: newPage }));
     }
   };
 
@@ -137,7 +128,6 @@ const DashboardPage = () => {
             <p>{userInfo.email}</p>
           </div>
         </div>
-
         <nav className="sidebar-nav">
           <ul>
             <li className="active">
@@ -146,7 +136,6 @@ const DashboardPage = () => {
             </li>
           </ul>
         </nav>
-
         <div className="sidebar-footer">
           <button onClick={handleLogout} className="logout-btn">
             <i className="icon-logout"></i>
@@ -214,11 +203,7 @@ const DashboardPage = () => {
                       {leads.map((lead) => (
                         <tr key={lead.id}>
                           <td>{lead.id}</td>
-                          <td>
-                            <div className="lead-name">
-                              {lead.nombre} {lead.apellidos}
-                            </div>
-                          </td>
+                          <td>{lead.nombre} {lead.apellidos}</td>
                           <td>{lead.correo}</td>
                           <td>{lead.telefono}</td>
                           <td>
@@ -232,13 +217,11 @@ const DashboardPage = () => {
                               <option value="descartado">Descartado</option>
                             </select>
                           </td>
-                          <td>
-                            {new Date(lead.created_at).toLocaleDateString('es-ES', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric'
-                            })}
-                          </td>
+                          <td>{new Date(lead.created_at).toLocaleDateString('es-ES', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                          })}</td>
                         </tr>
                       ))}
                     </tbody>
