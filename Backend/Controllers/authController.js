@@ -4,10 +4,7 @@ const bcrypt = require('bcryptjs');
 
 const login = async (req, res) => {
   const { username, password } = req.body;
-    if (!username || !password) {
-    return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
-  }
-
+   
   try {
     const user = await User.findByUsername(username);
        if (!user) {

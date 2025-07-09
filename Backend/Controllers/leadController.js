@@ -24,30 +24,26 @@ const getLeads = async (req, res) => {
     });
     
   } catch (error) {
+    console.error('Error al obtener los leads:', error);
     res.status(500).json({ error: 'Error al obtener los leads' });
   }
 };
 
 const updateLeadStatus = async (req, res) => {
-  const { id } = req.params;
+const { id } = req.params;
   const { status } = req.body;
-  
-  const validStatuses = ['nuevo', 'contactado', 'descartado'];
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({ error: 'Estado inválido' });
-  }
-
-  try {
-    await db.query(
-      'UPDATE ContacUs SET estado = ? WHERE id = ?',
-      [status, id]
-    );
-    
-    res.json({ message: 'Estado actualizado correctamente' });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar el estado' });
-  }
-};
+    try {
+      await db.query(
+        'UPDATE ContacUs SET estado = ? WHERE id = ?',
+        [status, id]
+      );
+      
+      res.json({ message: 'Estado actualizado correctamente' });
+    } catch (error) {
+      console.error('Error al actualizar el estado del lead:', error);
+      res.status(500).json({ error: 'Error al actualizar el estado' });
+    }
+  };
 
 const getStatusCounts = async (req, res) => {
   try {

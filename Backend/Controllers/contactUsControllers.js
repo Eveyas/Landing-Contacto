@@ -29,31 +29,16 @@ const getContactUs = async (req, res) => {
 const postContactUs = async (req, res) => {
   const { nombre, apellidos, correo, telefono, mensaje, aceptaTerminos, recaptchaResponse } = req.body;
   
-  // Validar campos
-  if (!nombre || !apellidos || !correo || !telefono || !mensaje) {
-    return res.status(400).json({ error: 'Todos los campos son obligatorios' });
-  }
-
-  // Validar términos y condiciones
-  if (!aceptaTerminos) {
-    return res.status(400).json({ error: 'Debe aceptar los términos y condiciones' });
-  }
-
-  // Validar reCAPTCHA
-  if (!recaptchaResponse) {
-    return res.status(400).json({ error: 'Token reCAPTCHA no proporcionado' });
-  }
-
-  try {
+try {
+    // Verificación reCAPTCHA
     const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaResponse}`;
     const recaptchaRes = await axios.post(verificationUrl);
-    
+
     if (!recaptchaRes.data.success) {
       return res.status(400).json({ error: 'Verificación reCAPTCHA fallida' });
     }
 
     // Insertar en base de datos
-    const query = 'INSERT INTO ContacUs (nombre, apellidos, correo, telefono, mensaje, acepta_terminos) VALUES (?,?,?,?,?,?)';
     const [results] = await db.query(query, [nombre, apellidos, correo, telefono, mensaje, true]);
     
     // Notificación al administrador (SendGrid)
@@ -61,7 +46,7 @@ const postContactUs = async (req, res) => {
       const msg = {
         to: process.env.ADMIN_EMAIL,
         from: process.env.SENDGRID_SENDER_EMAIL,
-        subject: 'Nuevo lead registrado - Soporte Técnico',
+        subject: 'Nuevo lead registrado - Soporte Técnico Profesional',
         text: `Se ha registrado un nuevo lead:
                Nombre: ${nombre} ${apellidos}
                Correo: ${correo}
