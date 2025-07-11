@@ -6,15 +6,15 @@ const app = express();
 const port = process.env.PORT;
 const db = require('./Config/Db');
 
-app.use(cors({
+const corsOptions = {
   origin: 'https://landing-contact-front-production.up.railway.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   optionsSuccessStatus: 200
-}));
+};
 
-app.options('*', cors());
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
