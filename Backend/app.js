@@ -6,14 +6,16 @@ const app = express();
 const port = process.env.PORT;
 const db = require('./Config/Db');
 
-const corsOptions = {
+app.use(cors({
   origin: 'https://landing-contact-front-production.up.railway.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-};
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
 
-app.use(cors(corsOptions));
+app.options('*', cors());
+
 app.use(express.json());
 
 // Rutas públicas
