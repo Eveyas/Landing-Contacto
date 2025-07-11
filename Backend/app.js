@@ -6,7 +6,14 @@ const app = express();
 const port = process.env.PORT;
 const db = require('./Config/Db');
 
-app.use(cors());
+const corsOptions = {
+  origin: 'https://landing-contact-front-production.up.railway.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Rutas públicas
@@ -28,5 +35,5 @@ app.get('/', (req, res) => {
 
 // Iniciar servidor
 app.listen(port, async () => {
-  console.log(`🚀 Server is running on port ${port}`);
+  console.log(`🚀 Servidor corriendo en el puerto ${port}`);
 });
