@@ -3,7 +3,7 @@ require('dotenv').config();
 const axios = require('axios');
 const sgMail = require('@sendgrid/mail');
 
-// Configurar SendGrid
+// Configuración de SendGrid
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Crear conexión a la base de datos
@@ -17,7 +17,6 @@ const db = mysql.createPool({
   queueLimit: 0
 }).promise();
 
-// Obtener todos los registros de contacto
 const getContactUs = async (req, res) => {
   try {
     const [results] = await db.query('SELECT * FROM ContacUs');
@@ -28,20 +27,19 @@ const getContactUs = async (req, res) => {
   }
 };
 
-// Insertar nuevo contacto
 const postContactUs = async (req, res) => {
-  const {
-    nombre,
-    apellidos,
-    correo,
-    telefono,
-    mensaje,
-    aceptaTerminos,
-    recaptchaResponse
-  } = req.body;
-
+  const { 
+	  nombre, 
+	  apellidos, 
+	  correo, 
+	  telefono, 
+	  mensaje, 
+	  aceptaTerminos, 
+	  recaptchaResponse 
+	  } = req.body;
+	  
   try {
-    // 1. Verificación reCAPTCHA
+    // Verificación del reCAPTCHA
     const recaptchaRes = await axios.post(
       'https://www.google.com/recaptcha/api/siteverify',
       new URLSearchParams({
@@ -49,51 +47,50 @@ const postContactUs = async (req, res) => {
         response: recaptchaResponse
       })
     );
-
+    
     if (!recaptchaRes.data.success) {
       return res.status(400).json({ error: 'Verificación reCAPTCHA fallida' });
     }
-
-    // 2. Insertar en la base de datos
+    
+    // Notificación al administrador (SendGrid)
+    // Insertar en la base de datos
     const [results] = await db.query(
       `INSERT INTO ContacUs (nombre, apellidos, correo, telefono, mensaje, acepta_terminos)
        VALUES (?, ?, ?, ?, ?, ?)`,
       [nombre, apellidos, correo, telefono, mensaje, aceptaTerminos]
     );
 
-    // 3. Enviar notificación por correo
+    // Notificación por correo
     try {
       const msg = {
         to: process.env.ADMIN_EMAIL,
         from: process.env.SENDGRID_SENDER_EMAIL,
         subject: 'Nuevo lead registrado - Soporte Técnico Profesional',
         text: `Se ha registrado un nuevo lead:
-Nombre: ${nombre} ${apellidos}
-Correo: ${correo}
-Teléfono: ${telefono}
-Mensaje: ${mensaje.substring(0, 200)}...`,
+               Nombre: ${nombre} ${apellidos}
+               Correo: ${correo}
+               Teléfono: ${telefono}
+               Mensaje: ${mensaje.substring(0, 200)}...`,
         html: `<strong>Nuevo lead:</strong>
-<p><b>Nombre:</b> ${nombre} ${apellidos}</p>
-<p><b>Correo:</b> ${correo}</p>
-<p><b>Teléfono:</b> ${telefono}</p>
-<p><b>Mensaje:</b> ${mensaje.substring(0, 500)}...</p>
-<p><a href="${process.env.ADMIN_PANEL_URL || '#'}">Ver en panel de administración</a></p>`
+               <p><b>Nombre:</b> ${nombre} ${apellidos}</p>
+               <p><b>Correo:</b> ${correo}</p>
+               <p><b>Teléfono:</b> ${telefono}</p>
+               <p><b>Mensaje:</b> ${mensaje.substring(0, 500)}...</p>
+               <p><a href="${process.env.ADMIN_PANEL_URL || '#'}">Ver en panel de administración</a></p>`,
       };
-
+    
       await sgMail.send(msg);
       console.log('✅ Notificación enviada con éxito');
     } catch (emailError) {
-      console.error('❌ Error al enviar notificación:', emailError);
+      console.error('❌ Error al enviar la notificación:', emailError);
     }
 
-    // 4. Respuesta al cliente
-    res.status(201).json({
-      message: 'Mensaje enviado con éxito',
+    res.status(201).json({ 
+      message: 'Mensaje enviado con éxito', 
       id: results.insertId
     });
-
   } catch (error) {
-    console.error('❌ Error general en postContactUs:', error);
+    console.error('❌ Error en el proceso:', error);
 
     let errorMessage = 'Error en el servidor';
     if (error.response && error.response.data) {
@@ -101,7 +98,6 @@ Mensaje: ${mensaje.substring(0, 200)}...`,
     } else if (error.message) {
       errorMessage = error.message;
     }
-
     res.status(500).json({ error: errorMessage });
   }
 };
