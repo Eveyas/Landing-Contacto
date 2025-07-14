@@ -7,7 +7,7 @@ const port = process.env.PORT;
 const db = require('./Config/Db');
 
 const corsOptions = {
-  origin: 'https://landing-contact-front-production.up.railway.app',
+  origin: process.env.FRONTEND_ORIGIN,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -15,7 +15,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// app.options('*', cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 // Rutas públicas
