@@ -45,13 +45,12 @@ const postContactUs = async (req, res) => {
       new URLSearchParams({
         secret: process.env.RECAPTCHA_SECRET_KEY,
         response: recaptchaResponse
-      })
+      }),
+        { timeout: 3000 }
     );
-
-    console.log('🔍 Respuesta reCAPTCHA:', recaptchaRes.data);
     
     if (!recaptchaRes.data.success) {
-      return res.status(400).json({ error: 'Verificación reCAPTCHA fallida', detalle: recaptchaRes.data });
+      return res.status(400).json({ error: 'Verificación reCAPTCHA fallida' });
     }
     
     // Notificación al administrador (SendGrid)
