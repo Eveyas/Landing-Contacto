@@ -47,9 +47,11 @@ const postContactUs = async (req, res) => {
         response: recaptchaResponse
       })
     );
+
+    console.log('🔍 Respuesta reCAPTCHA:', recaptchaRes.data);
     
     if (!recaptchaRes.data.success) {
-      return res.status(400).json({ error: 'Verificación reCAPTCHA fallida' });
+      return res.status(400).json({ error: 'Verificación reCAPTCHA fallida', detalle: recaptchaRes.data });
     }
     
     // Notificación al administrador (SendGrid)
