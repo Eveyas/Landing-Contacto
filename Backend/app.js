@@ -3,7 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.SERVER_PORT;
 const db = require('./Config/Db');
 
 const corsOptions = {
@@ -32,7 +32,7 @@ app.use('/api/leads', leadRoutes);
 
 // Endpoint raíz
 app.get('/', (req, res) => {
-  res.send('✅ Backend funcionando correctamente en producción');
+  res.send('✅ Backend funcionando correctamente');
 });
 
 // Iniciar servidor
