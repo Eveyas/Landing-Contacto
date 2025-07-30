@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
+//Landing-contacto/frontend/src/pages/DashboardPage
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../authContext';
 import '../styles/dashboard.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const DashboardPage = () => {
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +20,7 @@ const DashboardPage = () => {
   const [userInfo, setUserInfo] = useState({
     name: 'Administrador',
     lastname: '',
-    email: 'admin@gmail.com'
+    email: ''
   });
   const [globalStatusCounts, setGlobalStatusCounts] = useState({
     nuevo: 0,
@@ -22,85 +28,88 @@ const DashboardPage = () => {
     descartado: 0
   });
 
-  // Datos simulados
-  const mockLeads = [
-    {
-      id: 1,
-      nombre: 'Juan',
-      apellidos: 'Pérez',
-      correo: 'juan@gmail.com',
-      telefono: '123456789',
-      estado: 'nuevo',
-      created_at: new Date()
-    },
-    {
-      id: 2,
-      nombre: 'María',
-      apellidos: 'Gómez',
-      correo: 'maria@gmail.com',
-      telefono: '987654321',
-      estado: 'contactado',
-      created_at: new Date(Date.now() - 86400000)
-    },
-    {
-      id: 3,
-      nombre: 'Carlos',
-      apellidos: 'López',
-      correo: 'carlos@gmail.com',
-      telefono: '555555555',
-      estado: 'descartado',
-      created_at: new Date(Date.now() - 172800000)
+  const fetchLeads = useCallback(async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/leads?page=${pagination.currentPage}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setLeads(response.data.leads);
+      setPagination(response.data.pagination);
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  }, [pagination.currentPage]);
+
+  const fetchUserInfo = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/auth/user`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUserInfo({
+        name: response.data.name || 'Administrador',
+        lastname: response.data.lastname || '',
+        email: response.data.email || ''
+      });
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    }
+  }, []);
+
+  const fetchGlobalStatusCounts = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/leads/status-counts`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setGlobalStatusCounts(response.data);
+    } catch (error) {
+      console.error('Error fetching global status counts:', error);
+    }
+  }, []);
 
   useEffect(() => {
-    // Verificar autenticación
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-    if (!isAuthenticated) {
+    if (!currentUser) {
       navigate('/login');
       return;
     }
+    fetchLeads();
+    fetchUserInfo();
+    fetchGlobalStatusCounts();
+  }, [currentUser, navigate, fetchLeads, fetchUserInfo, fetchGlobalStatusCounts]);
 
-    // Simular carga de datos
-    setLoading(true);
-    setTimeout(() => {
-      setLeads(mockLeads);
-      setPagination({
-        currentPage: 1,
-        totalPages: 1,
-        totalLeads: mockLeads.length
-      });
-      
-      // Calcular conteos de estado
-      const counts = mockLeads.reduce((acc, lead) => {
-        acc[lead.estado] = (acc[lead.estado] || 0) + 1;
-        return acc;
-      }, { nuevo: 0, contactado: 0, descartado: 0 });
-      
-      setGlobalStatusCounts(counts);
-      setLoading(false);
-    }, 1000);
-  }, [navigate]);
+  const handleStatusChange = async (leadId, newStatus) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`${API_URL}/api/leads/${leadId}/status`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setLeads(leads.map(lead =>
+        lead.id === leadId ? { ...lead, estado: newStatus } : lead
+      ));
+      fetchGlobalStatusCounts();
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
 
-  const handleStatusChange = (leadId, newStatus) => {
-    setLeads(leads.map(lead =>
-      lead.id === leadId ? { ...lead, estado: newStatus } : lead
-    ));
-    
-    // Actualizar contadores
-    const counts = leads.reduce((acc, lead) => {
-      const status = lead.id === leadId ? newStatus : lead.estado;
-      acc[status] = (acc[status] || 0) + 1;
-      return acc;
-    }, { nuevo: 0, contactado: 0, descartado: 0 });
-    
-    setGlobalStatusCounts(counts);
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= pagination.totalPages) {
+      setPagination(prev => ({ ...prev, currentPage: newPage }));
+    }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
+    logout();
     navigate('/');
   };
+
+  if (!currentUser) return null;
 
   return (
     <div className="dashboard-container">
@@ -136,7 +145,7 @@ const DashboardPage = () => {
         </div>
       </aside>
 
-      {/* Contenido principal */}
+      {/* Contenido */}
       <main className="dashboard-content">
         <header className="dashboard-header">
           <div className="header-center">
@@ -178,46 +187,79 @@ const DashboardPage = () => {
                 <p>Cargando leads...</p>
               </div>
             ) : (
-              <div className="table-container">
-                <table className="dashboard-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Nombre</th>
-                      <th>Correo</th>
-                      <th>Teléfono</th>
-                      <th>Estado</th>
-                      <th>Fecha</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {leads.map((lead) => (
-                      <tr key={lead.id}>
-                        <td>{lead.id}</td>
-                        <td>{lead.nombre} {lead.apellidos}</td>
-                        <td>{lead.correo}</td>
-                        <td>{lead.telefono}</td>
-                        <td>
-                          <select
-                            value={lead.estado}
-                            onChange={(e) => handleStatusChange(lead.id, e.target.value)}
-                            className={`status-select ${lead.estado}`}
-                          >
-                            <option value="nuevo">Nuevo</option>
-                            <option value="contactado">Contactado</option>
-                            <option value="descartado">Descartado</option>
-                          </select>
-                        </td>
-                        <td>{new Date(lead.created_at).toLocaleDateString('es-ES', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric'
-                        })}</td>
+              <>
+                <div className="table-container">
+                  <table className="dashboard-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
                       </tr>
+                    </thead>
+                    <tbody>
+                      {leads.map((lead) => (
+                        <tr key={lead.id}>
+                          <td>{lead.id}</td>
+                          <td>{lead.nombre} {lead.apellidos}</td>
+                          <td>{lead.correo}</td>
+                          <td>{lead.telefono}</td>
+                          <td>
+                            <select
+                              value={lead.estado}
+                              onChange={(e) => handleStatusChange(lead.id, e.target.value)}
+                              className={`status-select ${lead.estado}`}
+                            >
+                              <option value="nuevo">Nuevo</option>
+                              <option value="contactado">Contactado</option>
+                              <option value="descartado">Descartado</option>
+                            </select>
+                          </td>
+                          <td>{new Date(lead.created_at).toLocaleDateString('es-ES', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                          })}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Paginación */}
+                <div className="pagination-controls">
+                  <button
+                    onClick={() => handlePageChange(pagination.currentPage - 1)}
+                    disabled={pagination.currentPage === 1}
+                    className="pagination-btn prev"
+                  >
+                    &lt; Anterior
+                  </button>
+
+                  <div className="pagination-numbers">
+                    {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`pagination-number ${pagination.currentPage === page ? 'active' : ''}`}
+                      >
+                        {page}
+                      </button>
                     ))}
-                  </tbody>
-                </table>
-              </div>
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(pagination.currentPage + 1)}
+                    disabled={pagination.currentPage === pagination.totalPages}
+                    className="pagination-btn next"
+                  >
+                    Siguiente &gt;
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>

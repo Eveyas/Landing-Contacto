@@ -1,6 +1,6 @@
+//Landing-contacto/frontend/src/components/ContactForm
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import '../styles/contactForm.css';
 
 const ContactForm = () => {
@@ -20,8 +20,8 @@ const ContactForm = () => {
   const timerRef = useRef(null);
   const recaptchaRef = useRef(null);
   const recaptchaWidgetId = useRef(null);
-  const navigate = useNavigate();
 
+  // Clave del recaptchaSiteKey
   const recaptchaSiteKey = "6LcvK3QrAAAAANU2Ng7wTyzrsjlKY8COG0ubD1NN";
 
   useEffect(() => {
@@ -93,6 +93,7 @@ const ContactForm = () => {
     
     setStatus(null);
     
+    // Validación de campos
     if (!form.nombre || !form.apellidos || !form.correo || !form.telefono || !form.mensaje) {
       setStatus({ type: 'error', message: 'Todos los campos son obligatorios.' });
       setIsSubmitting(false);
@@ -125,6 +126,7 @@ const ContactForm = () => {
         return;
       }
 
+      // Envio de datos al backend
       const API_URL = process.env.REACT_APP_API_URL;
       await axios.post(`${API_URL}/api/contact`, {
         ...form,
@@ -142,6 +144,7 @@ const ContactForm = () => {
         aceptaTerminos: false 
       });
       
+      // Reseteo de reCAPTCHA
       window.grecaptcha.reset(recaptchaWidgetId.current);
       
       timerRef.current = setTimeout(() => {
@@ -162,10 +165,6 @@ const ContactForm = () => {
     }
   };
 
-  const goToAdminPanel = () => {
-    navigate('/login');
-  };
-
   return (
     <div className="minimal-form-container">
       <div className="image-circle">
@@ -173,29 +172,130 @@ const ContactForm = () => {
       </div>
       
       <form onSubmit={handleSubmit} className="minimal-form">
-        {/* ... (resto del formulario existente) ... */}
-      </form>
-
-      <div style={{ textAlign: 'center', marginTop: '20px' }}>
-        <button 
-          onClick={goToAdminPanel}
-          className="hero-button admin-button"
+        <div className="form-row">
+          <div className="input-group">
+            <div className="inputBox">
+              <input
+                type="text"
+                name="nombre"
+                value={form.nombre}
+                onChange={handleChange}
+                required
+                placeholder=" "
+              />
+              <span>Nombre</span>
+            </div>
+          </div>
+          <div className="input-group">
+            <div className="inputBox">
+              <input
+                type="text"
+                name="apellidos"
+                value={form.apellidos}
+                onChange={handleChange}
+                required
+                placeholder=" "
+              />
+              <span>Apellidos</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="form-row">
+          <div className="input-group">
+            <div className="inputBox">
+              <input
+                type="email"
+                name="correo"
+                value={form.correo}
+                onChange={handleChange}
+                required
+                placeholder=" "
+              />
+              <span>Correo</span>
+            </div>
+          </div>
+          <div className="input-group">
+            <div className="inputBox">
+              <input
+                type="tel"
+                name="telefono"
+                value={form.telefono}
+                onChange={handleChange}
+                required
+                placeholder=" "
+              />
+              <span>Teléfono</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="input-group">
+          <div className="inputBox">
+            <textarea
+              name="mensaje"
+              value={form.mensaje}
+              onChange={handleChange}
+              required
+              placeholder=" "
+            ></textarea>
+            <span>Mensaje</span>
+          </div>
+        </div>
+        
+        {/* Términos y condiciones */}
+        <div className="input-group terms-container">
+          <label>
+            <input
+              type="checkbox"
+              name="aceptaTerminos"
+              checked={form.aceptaTerminos}
+              onChange={handleChange}
+              required
+            />
+            Acepto los <a 
+              href="https://policies.google.com/terms" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              términos y condiciones
+            </a> y la <a 
+              href="https://policies.google.com/privacy" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              política de privacidad
+            </a>
+          </label>
+        </div>
+        
+        {/* reCAPTCHA v2 */}
+        <div 
+          ref={recaptchaRef}
           style={{ 
-            background: '#555',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            border: 'none',
-            color: 'white',
-            cursor: 'pointer',
-            fontSize: '16px',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px'
+            marginTop: '5px 0 10px',
+            display: 'flex', 
+            justifyContent: 'center',
+            minHeight: '78px',
+            alignSelf: 'flex-start',
+            marginLeft: '5px',
           }}
-        >
-          🔐 Panel Administrador
+        ></div>
+        
+        <button 
+          type="submit" 
+          className="enter"
+          disabled={isSubmitting}
+        > 
+          {isSubmitting ? 'Enviando...' : 'Enviar'} ➤ 
         </button>
-      </div>
+        
+        {status && status.type === 'error' && (
+          <div className={`minimal-status ${status.type}`}>
+            {status.message}
+          </div>
+        )}
+      </form>
 
       {showSuccessModal && (
         <div className="success-modal">

@@ -1,5 +1,7 @@
+//Landing-contacto/frontend/src/pages/LoginPage
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../authContext';
 import '../styles/loginForm.css';
 
 const LoginPage = () => {
@@ -7,6 +9,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -15,74 +18,71 @@ const LoginPage = () => {
     setError('');
     
     try {
-      // Usuario y contraseña
-      if (username === 'admin' && password === 'admin123') {
-        localStorage.setItem('isAuthenticated', 'true');
+      const success = await login(username, password);
+      if (success) {
         navigate('/dashboard');
-      } else {
-        setError('Credenciales inválidas');
       }
     } catch (err) {
-      setError('Error al iniciar sesión');
+      setError('Credenciales inválidas');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
+   return (
     <div className="login-container">
       <div className="login-form-section">
-        <form onSubmit={handleSubmit} className="login-form">
-          <h2 className="login-title">
+      <form onSubmit={handleSubmit} className="login-form">
+        <h2 className="login-title">
             Panel de Administración
             <span>Ingresa tus credenciales válidas</span>
           </h2>
-          
-          <div className="login-input-group">
-            <div className="login-inputBox">
-              <input
-                id="username"
-                type="text"
-                name="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                placeholder=" "
-              />
-              <span>Usuario</span>
-            </div>
+        
+        <div className="login-input-group">
+          <div className="login-inputBox">
+            <input
+              id="username"
+              type="text"
+              name="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              placeholder=" "
+            />
+            <span>Usuario</span>
           </div>
-          
-          <div className="login-input-group">
-            <div className="login-inputBox">
-              <input
-                id="password"
-                type="password"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder=" "
-              />
-              <span>Contraseña</span>
-            </div>
+        </div>
+        
+        <div className="login-input-group">
+          <div className="login-inputBox">
+            <input
+              id="password"
+              type="password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder=" "
+            />
+            <span>Contraseña</span>
           </div>
-          
-          {error && (
-            <div className="login-minimal-status login-error">
-              {error}
-            </div>
-          )}
-          
-          <button 
-            type="submit" 
-            className="login-enter"
-            disabled={isSubmitting}
-          > 
-            {isSubmitting ? 'Ingresando...' : 'Ingresar'} 
-          </button>
-        </form>
-      </div>
+        </div>
+        
+        {error && (
+          <div className="login-minimal-status login-error">
+            {error}
+          </div>
+        )}
+        
+        <button 
+          type="submit" 
+          className="login-enter"
+          disabled={isSubmitting}
+        > 
+          {isSubmitting ? 'Ingresando...' : 'Ingresar'} 
+        </button>
+      </form>
+    </div>
       <div className="login-image-section">
         <img 
           src="https://images.pexels.com/photos/38568/apple-imac-ipad-workplace-38568.jpeg" 
@@ -96,3 +96,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+

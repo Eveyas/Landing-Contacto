@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './Authentication/AuthContext';
+import { AuthProvider } from './authContext';
 import Landing from './components/Landing';
 import LoginPage from './Pages/LoginPage';
 import DashboardPage from './Pages/DashboardPage';
@@ -9,13 +9,13 @@ import './App.css';
 // Protección de rutas
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token');
-    return token ? children : <Navigate to="/login" replace />;
+  return token ? children : <Navigate to="/login" replace />;
 };
 
 const App = () => {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <Routes>
           {/* Rutas publicas */}
           <Route path="/" element={<Landing />} />
@@ -34,8 +34,8 @@ const App = () => {
           {/* Redirección de rutas */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 };
 
