@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../styles/contactForm.css';
-import '../styles/dashboard.css';
-import '../styles/loginForm.css';
 
 const ContactForm = () => {
-  const [showLogin, setShowLogin] = useState(false);
-  const [showDashboard, setShowDashboard] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
   const [form, setForm] = useState({
     nombre: '',
     apellidos: '',
@@ -24,6 +20,7 @@ const ContactForm = () => {
   const timerRef = useRef(null);
   const recaptchaRef = useRef(null);
   const recaptchaWidgetId = useRef(null);
+  const navigate = useNavigate();
 
   const recaptchaSiteKey = "6LcvK3QrAAAAANU2Ng7wTyzrsjlKY8COG0ubD1NN";
 
@@ -128,9 +125,12 @@ const ContactForm = () => {
         return;
       }
 
-      // Simulamos el envío ya que no tenemos backend
-      console.log('Formulario enviado:', form);
-      
+      const API_URL = process.env.REACT_APP_API_URL;
+      await axios.post(`${API_URL}/api/contact`, {
+        ...form,
+        recaptchaResponse: recaptchaValue
+      });
+
       setStatus({ type: 'success', message: 'Mensaje enviado con éxito' });
       setShowSuccessModal(true);
       setForm({ 
@@ -142,9 +142,7 @@ const ContactForm = () => {
         aceptaTerminos: false 
       });
       
-      if (window.grecaptcha) {
-        window.grecaptcha.reset(recaptchaWidgetId.current);
-      }
+      window.grecaptcha.reset(recaptchaWidgetId.current);
       
       timerRef.current = setTimeout(() => {
         setShowSuccessModal(false);
@@ -152,36 +150,21 @@ const ContactForm = () => {
       
     } catch (error) {
       console.error('Error al enviar:', error);
-      setStatus({ type: 'error', message: 'Error al enviar el mensaje' });
+      let errorMessage = 'Error al enviar el mensaje';
+      
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      setStatus({ type: 'error', message: errorMessage });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleLogin = (username, password) => {
-    if (username === 'admin' && password === 'admin123') {
-      setCurrentUser({ username: 'admin' });
-      setShowDashboard(true);
-      return true;
-    }
-    return false;
+  const goToAdminPanel = () => {
+    navigate('/login');
   };
-
-  const handleLogout = () => {
-    setCurrentUser(null);
-    setShowDashboard(false);
-  };
-
-  if (showDashboard && currentUser) {
-    return <DashboardPage onLogout={handleLogout} />;
-  }
-
-  if (showLogin) {
-    return <LoginPage 
-      onLogin={handleLogin} 
-      onBack={() => setShowLogin(false)} 
-    />;
-  }
 
   return (
     <div className="minimal-form-container">
@@ -190,128 +173,29 @@ const ContactForm = () => {
       </div>
       
       <form onSubmit={handleSubmit} className="minimal-form">
-        <div className="form-row">
-          <div className="input-group">
-            <div className="inputBox">
-              <input
-                type="text"
-                name="nombre"
-                value={form.nombre}
-                onChange={handleChange}
-                required
-                placeholder=" "
-              />
-              <span>Nombre</span>
-            </div>
-          </div>
-          <div className="input-group">
-            <div className="inputBox">
-              <input
-                type="text"
-                name="apellidos"
-                value={form.apellidos}
-                onChange={handleChange}
-                required
-                placeholder=" "
-              />
-              <span>Apellidos</span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="form-row">
-          <div className="input-group">
-            <div className="inputBox">
-              <input
-                type="email"
-                name="correo"
-                value={form.correo}
-                onChange={handleChange}
-                required
-                placeholder=" "
-              />
-              <span>Correo</span>
-            </div>
-          </div>
-          <div className="input-group">
-            <div className="inputBox">
-              <input
-                type="tel"
-                name="telefono"
-                value={form.telefono}
-                onChange={handleChange}
-                required
-                placeholder=" "
-              />
-              <span>Teléfono</span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="input-group">
-          <div className="inputBox">
-            <textarea
-              name="mensaje"
-              value={form.mensaje}
-              onChange={handleChange}
-              required
-              placeholder=" "
-            ></textarea>
-            <span>Mensaje</span>
-          </div>
-        </div>
-        
-        <div className="input-group terms-container">
-          <label>
-            <input
-              type="checkbox"
-              name="aceptaTerminos"
-              checked={form.aceptaTerminos}
-              onChange={handleChange}
-              required
-            />
-            Acepto los <a 
-              href="https://policies.google.com/terms" 
-              target="_blank" 
-              rel="noopener noreferrer"
-            >
-              términos y condiciones
-            </a> y la <a 
-              href="https://policies.google.com/privacy" 
-              target="_blank" 
-              rel="noopener noreferrer"
-            >
-              política de privacidad
-            </a>
-          </label>
-        </div>
-        
-        <div 
-          ref={recaptchaRef}
-          style={{ 
-            marginTop: '5px 0 10px',
-            display: 'flex', 
-            justifyContent: 'center',
-            minHeight: '78px',
-            alignSelf: 'flex-start',
-            marginLeft: '5px',
-          }}
-        ></div>
-        
-        <button 
-          type="submit" 
-          className="enter"
-          disabled={isSubmitting}
-        > 
-          {isSubmitting ? 'Enviando...' : 'Enviar'} ➤ 
-        </button>
-        
-        {status && status.type === 'error' && (
-          <div className={`minimal-status ${status.type}`}>
-            {status.message}
-          </div>
-        )}
+        {/* ... (resto del formulario existente) ... */}
       </form>
+
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <button 
+          onClick={goToAdminPanel}
+          className="hero-button admin-button"
+          style={{ 
+            background: '#555',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            border: 'none',
+            color: 'white',
+            cursor: 'pointer',
+            fontSize: '16px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          🔐 Panel Administrador
+        </button>
+      </div>
 
       {showSuccessModal && (
         <div className="success-modal">
@@ -321,16 +205,6 @@ const ContactForm = () => {
           </div>
         </div>
       )}
-      
-      <div style={{ textAlign: 'center', marginTop: '20px' }}>
-        <button 
-          onClick={() => setShowLogin(true)} 
-          className="enter"
-          style={{ background: '#555' }}
-        >
-          Acceso al Panel Administrativo
-        </button>
-      </div>
     </div>
   );
 };

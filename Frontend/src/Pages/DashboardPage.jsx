@@ -1,28 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/dashboard.css';
 
-const DashboardPage = ({ onLogout }) => {
-  const mockLeads = [
-    {
-      id: 1, 
-      nombre: 'Admin', 
-      apellidos: 'López', 
-      correo: 'admin123@gmail.com', 
-      telefono: '123456789', 
-      estado: 'nuevo',
-      created_at: new Date()
-    },
-    {
-      id: 2, 
-      nombre: 'María', 
-      apellidos: 'Lípez', 
-      correo: 'maria@gmail.com', 
-      telefono: '987654321', 
-      estado: 'contactado',
-      created_at: new Date(Date.now() - 86400000)
-    },
-  ];
-
+const DashboardPage = () => {
+  const navigate = useNavigate();
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -33,7 +14,7 @@ const DashboardPage = ({ onLogout }) => {
   const [userInfo, setUserInfo] = useState({
     name: 'Administrador',
     lastname: '',
-    email: 'admin123@gmail.com'
+    email: 'admin@gmail.com'
   });
   const [globalStatusCounts, setGlobalStatusCounts] = useState({
     nuevo: 0,
@@ -41,7 +22,46 @@ const DashboardPage = ({ onLogout }) => {
     descartado: 0
   });
 
-  const fetchLeads = () => {
+  // Datos simulados
+  const mockLeads = [
+    {
+      id: 1,
+      nombre: 'Juan',
+      apellidos: 'Pérez',
+      correo: 'juan@gmail.com',
+      telefono: '123456789',
+      estado: 'nuevo',
+      created_at: new Date()
+    },
+    {
+      id: 2,
+      nombre: 'María',
+      apellidos: 'Gómez',
+      correo: 'maria@gmail.com',
+      telefono: '987654321',
+      estado: 'contactado',
+      created_at: new Date(Date.now() - 86400000)
+    },
+    {
+      id: 3,
+      nombre: 'Carlos',
+      apellidos: 'López',
+      correo: 'carlos@gmail.com',
+      telefono: '555555555',
+      estado: 'descartado',
+      created_at: new Date(Date.now() - 172800000)
+    }
+  ];
+
+  useEffect(() => {
+    // Verificar autenticación
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    // Simular carga de datos
     setLoading(true);
     setTimeout(() => {
       setLeads(mockLeads);
@@ -51,6 +71,7 @@ const DashboardPage = ({ onLogout }) => {
         totalLeads: mockLeads.length
       });
       
+      // Calcular conteos de estado
       const counts = mockLeads.reduce((acc, lead) => {
         acc[lead.estado] = (acc[lead.estado] || 0) + 1;
         return acc;
@@ -59,11 +80,7 @@ const DashboardPage = ({ onLogout }) => {
       setGlobalStatusCounts(counts);
       setLoading(false);
     }, 1000);
-  };
-
-  useEffect(() => {
-    fetchLeads();
-  }, []);
+  }, [navigate]);
 
   const handleStatusChange = (leadId, newStatus) => {
     setLeads(leads.map(lead =>
@@ -80,18 +97,14 @@ const DashboardPage = ({ onLogout }) => {
     setGlobalStatusCounts(counts);
   };
 
-  const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= pagination.totalPages) {
-      setPagination(prev => ({ ...prev, currentPage: newPage }));
-    }
-  };
-
   const handleLogout = () => {
-    onLogout();
+    localStorage.removeItem('isAuthenticated');
+    navigate('/');
   };
 
   return (
     <div className="dashboard-container">
+      {/* Sidebar */}
       <aside className="dashboard-sidebar">
         <div className="sidebar-header">
           <div className="user-avatar">
@@ -123,6 +136,7 @@ const DashboardPage = ({ onLogout }) => {
         </div>
       </aside>
 
+      {/* Contenido principal */}
       <main className="dashboard-content">
         <header className="dashboard-header">
           <div className="header-center">
@@ -164,78 +178,46 @@ const DashboardPage = ({ onLogout }) => {
                 <p>Cargando leads...</p>
               </div>
             ) : (
-              <>
-                <div className="table-container">
-                  <table className="dashboard-table">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Teléfono</th>
-                        <th>Estado</th>
-                        <th>Fecha</th>
+              <div className="table-container">
+                <table className="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Nombre</th>
+                      <th>Correo</th>
+                      <th>Teléfono</th>
+                      <th>Estado</th>
+                      <th>Fecha</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leads.map((lead) => (
+                      <tr key={lead.id}>
+                        <td>{lead.id}</td>
+                        <td>{lead.nombre} {lead.apellidos}</td>
+                        <td>{lead.correo}</td>
+                        <td>{lead.telefono}</td>
+                        <td>
+                          <select
+                            value={lead.estado}
+                            onChange={(e) => handleStatusChange(lead.id, e.target.value)}
+                            className={`status-select ${lead.estado}`}
+                          >
+                            <option value="nuevo">Nuevo</option>
+                            <option value="contactado">Contactado</option>
+                            <option value="descartado">Descartado</option>
+                          </select>
+                        </td>
+                        <td>{new Date(lead.created_at).toLocaleDateString('es-ES', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric'
+                        })}</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {leads.map((lead) => (
-                        <tr key={lead.id}>
-                          <td>{lead.id}</td>
-                          <td>{lead.nombre} {lead.apellidos}</td>
-                          <td>{lead.correo}</td>
-                          <td>{lead.telefono}</td>
-                          <td>
-                            <select
-                              value={lead.estado}
-                              onChange={(e) => handleStatusChange(lead.id, e.target.value)}
-                              className={`status-select ${lead.estado}`}
-                            >
-                              <option value="nuevo">Nuevo</option>
-                              <option value="contactado">Contactado</option>
-                              <option value="descartado">Descartado</option>
-                            </select>
-                          </td>
-                          <td>{new Date(lead.created_at).toLocaleDateString('es-ES', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric'
-                          })}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="pagination-controls">
-                  <button
-                    onClick={() => handlePageChange(pagination.currentPage - 1)}
-                    disabled={pagination.currentPage === 1}
-                    className="pagination-btn prev"
-                  >
-                    &lt; Anterior
-                  </button>
-
-                  <div className="pagination-numbers">
-                    {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`pagination-number ${pagination.currentPage === page ? 'active' : ''}`}
-                      >
-                        {page}
-                      </button>
                     ))}
-                  </div>
-
-                  <button
-                    onClick={() => handlePageChange(pagination.currentPage + 1)}
-                    disabled={pagination.currentPage === pagination.totalPages}
-                    className="pagination-btn next"
-                  >
-                    Siguiente &gt;
-                  </button>
-                </div>
-              </>
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </div>
