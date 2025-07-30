@@ -5,9 +5,9 @@ const DashboardPage = ({ onLogout }) => {
   const mockLeads = [
     {
       id: 1, 
-      nombre: 'Juan', 
-      apellidos: 'Pérez', 
-      correo: 'juan@example.com', 
+      nombre: 'Admin', 
+      apellidos: 'López', 
+      correo: 'admin123@gmail.com', 
       telefono: '123456789', 
       estado: 'nuevo',
       created_at: new Date()
@@ -15,39 +15,12 @@ const DashboardPage = ({ onLogout }) => {
     {
       id: 2, 
       nombre: 'María', 
-      apellidos: 'Gómez', 
-      correo: 'maria@example.com', 
+      apellidos: 'Lípez', 
+      correo: 'maria@gmail.com', 
       telefono: '987654321', 
       estado: 'contactado',
       created_at: new Date(Date.now() - 86400000)
     },
-    {
-      id: 3, 
-      nombre: 'Carlos', 
-      apellidos: 'López', 
-      correo: 'carlos@example.com', 
-      telefono: '555555555', 
-      estado: 'descartado',
-      created_at: new Date(Date.now() - 172800000)
-    },
-    {
-      id: 4, 
-      nombre: 'Ana', 
-      apellidos: 'Martínez', 
-      correo: 'ana@example.com', 
-      telefono: '111222333', 
-      estado: 'nuevo',
-      created_at: new Date(Date.now() - 259200000)
-    },
-    {
-      id: 5, 
-      nombre: 'Pedro', 
-      apellidos: 'Sánchez', 
-      correo: 'pedro@example.com', 
-      telefono: '444555666', 
-      estado: 'contactado',
-      created_at: new Date(Date.now() - 345600000)
-    }
   ];
 
   const [leads, setLeads] = useState([]);
@@ -60,7 +33,7 @@ const DashboardPage = ({ onLogout }) => {
   const [userInfo, setUserInfo] = useState({
     name: 'Administrador',
     lastname: '',
-    email: 'admin@example.com'
+    email: 'admin123@gmail.com'
   });
   const [globalStatusCounts, setGlobalStatusCounts] = useState({
     nuevo: 0,

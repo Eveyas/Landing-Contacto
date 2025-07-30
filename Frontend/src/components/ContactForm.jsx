@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import '../styles/contactForm.css';
-import LoginPage from '../Pages/LoginPage';
-import DashboardPage from '../Pages/DashboardPage';
+import '../styles/dashboard.css';
+import '../styles/loginForm.css';
 
 const ContactForm = () => {
   const [showLogin, setShowLogin] = useState(false);
