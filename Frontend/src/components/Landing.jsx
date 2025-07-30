@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import ContactForm from './ContactForm';
+import ContactForm from '../components/ContactForm';
 
 const Landing = () => {
   const navigate = useNavigate();

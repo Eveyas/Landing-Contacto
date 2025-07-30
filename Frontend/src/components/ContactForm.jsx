@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/contactForm.css';
-import LoginPage from './login';
-import DashboardPage from './dashboard';
+import LoginPage from '../Pages/LoginPage';
+import DashboardPage from '../Pages/DashboardPage';
 
 const ContactForm = () => {
   const [showLogin, setShowLogin] = useState(false);
