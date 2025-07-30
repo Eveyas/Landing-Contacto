@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../Authentication/AuthContext';
 import '../styles/loginForm.css';
 
-const LoginPage = () => {
+const LoginPage = ({ onLogin, onBack }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,10 +13,12 @@ const LoginPage = () => {
     setError('');
     
     try {
-      await login(username, password);
-      navigate('/dashboard');
+      const success = onLogin(username, password);
+      if (!success) {
+        setError('Credenciales inválidas');
+      }
     } catch (err) {
-      setError('Credenciales inválidas');
+      setError('Error en el servidor');
     } finally {
       setIsSubmitting(false);
     }
@@ -77,6 +75,20 @@ const LoginPage = () => {
           disabled={isSubmitting}
         > 
           {isSubmitting ? 'Ingresando...' : 'Ingresar'} 
+        </button>
+        
+        <button 
+          type="button" 
+          className="login-back"
+          onClick={onBack}
+          style={{ 
+            marginTop: '10px',
+            background: '#777',
+            width: '100%',
+            padding: '12px'
+          }}
+        >
+          Volver al formulario
         </button>
       </form>
     </div>

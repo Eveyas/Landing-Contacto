@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import '../styles/contactForm.css';
+import LoginPage from './login';
+import DashboardPage from './dashboard';
 
 const ContactForm = () => {
+  const [showLogin, setShowLogin] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const [form, setForm] = useState({
     nombre: '',
     apellidos: '',
@@ -20,7 +25,6 @@ const ContactForm = () => {
   const recaptchaRef = useRef(null);
   const recaptchaWidgetId = useRef(null);
 
-  // Clave del recaptchaSiteKey
   const recaptchaSiteKey = "6LcvK3QrAAAAANU2Ng7wTyzrsjlKY8COG0ubD1NN";
 
   useEffect(() => {
@@ -92,7 +96,6 @@ const ContactForm = () => {
     
     setStatus(null);
     
-    // Validación de campos
     if (!form.nombre || !form.apellidos || !form.correo || !form.telefono || !form.mensaje) {
       setStatus({ type: 'error', message: 'Todos los campos son obligatorios.' });
       setIsSubmitting(false);
@@ -125,13 +128,9 @@ const ContactForm = () => {
         return;
       }
 
-      // Envio de datos al backend
-      const API_URL = process.env.REACT_APP_API_URL;
-      await axios.post(`${API_URL}/api/contact`, {
-        ...form,
-        recaptchaResponse: recaptchaValue
-      });
-
+      // Simulamos el envío ya que no tenemos backend
+      console.log('Formulario enviado:', form);
+      
       setStatus({ type: 'success', message: 'Mensaje enviado con éxito' });
       setShowSuccessModal(true);
       setForm({ 
@@ -143,8 +142,9 @@ const ContactForm = () => {
         aceptaTerminos: false 
       });
       
-      // Reseteo de reCAPTCHA
-      window.grecaptcha.reset(recaptchaWidgetId.current);
+      if (window.grecaptcha) {
+        window.grecaptcha.reset(recaptchaWidgetId.current);
+      }
       
       timerRef.current = setTimeout(() => {
         setShowSuccessModal(false);
@@ -152,17 +152,36 @@ const ContactForm = () => {
       
     } catch (error) {
       console.error('Error al enviar:', error);
-      let errorMessage = 'Error al enviar el mensaje';
-      
-      if (error.response && error.response.data && error.response.data.error) {
-        errorMessage = error.response.data.error;
-      }
-      
-      setStatus({ type: 'error', message: errorMessage });
+      setStatus({ type: 'error', message: 'Error al enviar el mensaje' });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const handleLogin = (username, password) => {
+    if (username === 'admin' && password === 'admin123') {
+      setCurrentUser({ username: 'admin' });
+      setShowDashboard(true);
+      return true;
+    }
+    return false;
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setShowDashboard(false);
+  };
+
+  if (showDashboard && currentUser) {
+    return <DashboardPage onLogout={handleLogout} />;
+  }
+
+  if (showLogin) {
+    return <LoginPage 
+      onLogin={handleLogin} 
+      onBack={() => setShowLogin(false)} 
+    />;
+  }
 
   return (
     <div className="minimal-form-container">
@@ -242,7 +261,6 @@ const ContactForm = () => {
           </div>
         </div>
         
-        {/* Términos y condiciones */}
         <div className="input-group terms-container">
           <label>
             <input
@@ -268,7 +286,6 @@ const ContactForm = () => {
           </label>
         </div>
         
-        {/* reCAPTCHA v2 */}
         <div 
           ref={recaptchaRef}
           style={{ 
@@ -304,6 +321,16 @@ const ContactForm = () => {
           </div>
         </div>
       )}
+      
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <button 
+          onClick={() => setShowLogin(true)} 
+          className="enter"
+          style={{ background: '#555' }}
+        >
+          Acceso al Panel Administrativo
+        </button>
+      </div>
     </div>
   );
 };
