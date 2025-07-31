@@ -5,7 +5,7 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -35,10 +35,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
      try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
-      username,
-      password
-    });
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
+        username,
+        password
+      });
       
     localStorage.setItem('token', response.data.token);
       setCurrentUser(response.data.user);

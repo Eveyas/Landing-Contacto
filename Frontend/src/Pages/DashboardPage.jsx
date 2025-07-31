@@ -4,7 +4,7 @@ import { useAuth } from '../Authentication/AuthContext';
 import axios from 'axios';
 import '../styles/dashboard.css';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
 const DashboardPage = () => {
   const { currentUser, logout } = useAuth();
