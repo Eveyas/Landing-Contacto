@@ -10,9 +10,7 @@ const db = require('./Config/Db');
 
 const corsOptions = {
   origin: [
-    process.env.FRONTEND_ORIGIN, 
-    'http://localhost:3001'
-  ],
+    process.env.FRONTEND_ORIGIN ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
