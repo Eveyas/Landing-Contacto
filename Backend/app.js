@@ -10,7 +10,10 @@ const db = require('./Config/Db');
 
 const corsOptions = {
   origin: [
-    process.env.FRONTEND_ORIGIN],
+    // process.env.FRONTEND_ORIGIN
+     'https://landing-contacto-front.onrender.com',
+    'http://localhost:3001'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -18,7 +21,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// app.options('*', cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 // Rutas públicas
