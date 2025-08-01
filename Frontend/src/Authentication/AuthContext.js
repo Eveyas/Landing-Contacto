@@ -5,7 +5,10 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-const API_URL = process.env.REACT_APP_API_URL;
+// const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.NODE_ENV === 'production'
+  ? 'https://landing-contacto-back.onrender.com'
+  : 'http://localhost:3000';
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
