@@ -4,12 +4,43 @@ const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 
 /**
- * @desc    Registrar un nuevo usuario
+ * @desc    Iniciar sesión de usuario
+ * @route   POST /api/auth/login
+ * @access  Public
+ */
+const login = async (req, res) => {
+  const { username, password } = req.body;
+   
+  try {
+    const user = await User.findByUsername(username);
+    if (!user) {
+      return res.status(401).json({ error: 'Credenciales inválidas' });
+    }
+
+    const validPassword = await User.comparePasswords(password, user.password);
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Credenciales inválidas' });
+    }
+
+    const token = generateToken(user);
+    
+    res.json({ 
+      token,
+      user: userResponse(user)
+    });
+    
+  } catch (error) {
+    console.error('Error en login:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+};
+
+/**
+ * @desc    Registrar nuevo usuario
  * @route   POST /api/auth/register
  * @access  Public
  */
 const register = async (req, res) => {
-  // Validar los datos de entrada
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -18,62 +49,69 @@ const register = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // Verificar si el usuario ya existe
-    const existingUser = await User.findByUsername(username);
-    if (existingUser) {
-      return res.status(400).json({ error: 'El nombre de usuario ya está en uso' });
+    if (await User.findByUsername(username)) {
+      return res.status(400).json({ error: 'Nombre de usuario no disponible' });
     }
 
-    // Hash de la contraseña
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({ username, password: hashedPassword });
+    const token = generateToken(newUser);
 
-    // Crear el nuevo usuario
-    const newUser = await User.create({
-      username,
-      password: hashedPassword
-    });
-
-    // Generar token JWT
-    const token = jwt.sign(
-      { userId: newUser.id, username: newUser.username },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    // Respuesta exitosa
     res.status(201).json({
       token,
-      user: {
-        id: newUser.id,
-        username: newUser.username
-      }
+      user: userResponse(newUser)
     });
 
   } catch (error) {
     console.error('Error en registro:', error);
-    res.status(500).json({ error: 'Error en el servidor al registrar usuario' });
+    res.status(500).json({ error: 'Error al registrar usuario' });
   }
 };
 
 /**
- * @desc    Obtener todos los usuarios (solo para administradores)
+ * @desc    Verificar token de usuario
+ * @route   GET /api/auth/verify
+ * @access  Private
+ */
+const verifyToken = (req, res) => {
+  res.json({ user: userResponse(req.user) });
+};
+
+/**
+ * @desc    Obtener todos los usuarios
  * @route   GET /api/auth/users
  * @access  Private/Admin
  */
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll();
-    res.json(users);
+    res.json(users.map(userResponse));
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
-    res.status(500).json({ error: 'Error en el servidor' });
+    res.status(500).json({ error: 'Error al obtener usuarios' });
   }
 };
 
+// Funciones auxiliares
+const generateToken = (user) => {
+  return jwt.sign(
+    { userId: user.id, username: user.username },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }
+  );
+};
+
+const userResponse = (user) => {
+  return {
+    id: user.id,
+    username: user.username,
+    createdAt: user.created_at
+  };
+};
+
 module.exports = {
-  login: require('./authController').login,
-  verifyToken: require('./authController').verifyToken,
+  login,
   register,
+  verifyToken,
   getAllUsers
 };

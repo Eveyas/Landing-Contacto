@@ -3,50 +3,52 @@ const bcrypt = require('bcryptjs');
 
 class User {
   /**
-   * @desc    Crear un nuevo usuario
-   * @param   {Object} userData - Datos del usuario {username, password}
-   * @return  {Promise} Retorna el ID del usuario creado
+   * Crear nuevo usuario
+   * @param {Object} userData - {username, password}
+   * @returns {Promise<Object>} Usuario creado
    */
   static async create({ username, password }) {
     const { rows } = await db.query(
-      'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username',
+      `INSERT INTO users (username, password) 
+       VALUES ($1, $2) 
+       RETURNING id, username, created_at`,
       [username, password]
     );
     return rows[0];
   }
 
   /**
-   * @desc    Buscar usuario por nombre de usuario
-   * @param   {String} username
-   * @return  {Promise} Retorna el usuario o undefined
+   * Buscar usuario por username
+   * @param {String} username
+   * @returns {Promise<Object|null>} Usuario encontrado o null
    */
   static async findByUsername(username) {
     const { rows } = await db.query(
       'SELECT * FROM users WHERE username = $1',
       [username]
     );
-    return rows[0];
+    return rows[0] || null;
   }
 
   /**
-   * @desc    Obtener todos los usuarios
-   * @return  {Promise} Retorna array de usuarios
+   * Obtener todos los usuarios
+   * @returns {Promise<Array>} Lista de usuarios
    */
   static async findAll() {
     const { rows } = await db.query(
-      'SELECT id, username, created_at FROM users'
+      'SELECT id, username, created_at FROM users ORDER BY created_at DESC'
     );
     return rows;
   }
 
   /**
-   * @desc    Comparar contraseñas
-   * @param   {String} password - Contraseña en texto plano
-   * @param   {String} hashedPassword - Contraseña hasheada
-   * @return  {Promise<Boolean>} Retorna true si coinciden
+   * Comparar contraseña con hash
+   * @param {String} password
+   * @param {String} hash
+   * @returns {Promise<Boolean>} Si coinciden
    */
-  static async comparePasswords(password, hashedPassword) {
-    return await bcrypt.compare(password, hashedPassword);
+  static async comparePassword(password, hash) {
+    return bcrypt.compare(password, hash);
   }
 }
 
