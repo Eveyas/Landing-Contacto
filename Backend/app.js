@@ -11,8 +11,7 @@ const db = require('./Config/Db');
 const corsOptions = {
   origin: [
     // process.env.FRONTEND_ORIGIN
-     'https://landing-contacto-front.onrender.com',
-    'http://localhost:3001'
+     'https://landing-contacto-front.onrender.com'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -50,11 +49,11 @@ app.get('/health', (req, res) => {
 });
 
 // Iniciar servidor
-// app.listen(port, async () => {
-//   console.log(`🚀 Servidor corriendo en el puerto ${port}`);
-// });
-
-app.listen(port, () => {
-  console.log(`🚀 Servidor corriendo en https://landing-contacto-back.onrender.com`);
-  console.log(`🔗 Frontend: ${process.env.FRONTEND_ORIGIN}`);
+app.listen(port, async () => {
+  console.log(`🚀 Servidor corriendo en el puerto ${port}`);
 });
+
+// app.listen(port, () => {
+//   console.log(`🚀 Servidor corriendo en https://landing-contacto-back.onrender.com`);
+//   console.log(`🔗 Frontend: ${process.env.FRONTEND_ORIGIN}`);
+// });
