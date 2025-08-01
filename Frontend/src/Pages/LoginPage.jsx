@@ -1,6 +1,7 @@
+//Landing-contacto/frontend/src/pages/LoginPage
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../Authentication/AuthContext';
+import { useAuth } from '../authContext';
 import '../styles/loginForm.css';
 
 const LoginPage = () => {
@@ -17,8 +18,10 @@ const LoginPage = () => {
     setError('');
     
     try {
-      await login(username, password);
-      navigate('/dashboard');
+      const success = await login(username, password);
+      if (success) {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError('Credenciales inválidas');
     } finally {
@@ -93,3 +96,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+

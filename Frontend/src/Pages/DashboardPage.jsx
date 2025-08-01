@@ -1,13 +1,11 @@
+//Landing-contacto/frontend/src/pages/DashboardPage
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../Authentication/AuthContext';
 import axios from 'axios';
+import { useAuth } from '../authContext';
 import '../styles/dashboard.css';
 
 const API_URL = process.env.REACT_APP_API_URL;
-// const API_URL = process.env.NODE_ENV === 'production'
-//   ? 'https://landing-contacto-back.onrender.com'
-//   : 'http://localhost:3000';
 
 const DashboardPage = () => {
   const { currentUser, logout } = useAuth();

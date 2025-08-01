@@ -1,3 +1,4 @@
+//Landing-contacto/frontend/src/components/ContactForm
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import '../styles/contactForm.css';
@@ -127,9 +128,6 @@ const ContactForm = () => {
 
       // Envio de datos al backend
       const API_URL = process.env.REACT_APP_API_URL;
-  //     const API_URL = process.env.NODE_ENV === 'production'
-  // ? 'https://landing-contacto-back.onrender.com'
-  // : 'http://localhost:3000';
       await axios.post(`${API_URL}/api/contact`, {
         ...form,
         recaptchaResponse: recaptchaValue
