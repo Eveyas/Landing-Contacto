@@ -7,34 +7,16 @@ const app = express();
 // const port = process.env.PORT;
 const port = process.env.PORT || 3000;
 const db = require('./Config/Db');
+
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Lista de dominios permitidos
-    const allowedOrigins = [
-      process.env.FRONTEND_ORIGIN, // Tu frontend en Render
-      'http://localhost:3001',     // Desarrollo local
-      'https://landing-contacto-front.onrender.com' // URL explícita
-    ];
-    
-    // Permitir solicitudes sin origen (como apps móviles o Postman)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      console.error(`Origen no permitido: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: [
+    process.env.FRONTEND_ORIGIN ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-  optionsSuccessStatus: 200,
-  maxAge: 86400 // Cachear configuraciones CORS por 24 horas
+  optionsSuccessStatus: 200
 };
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Habilitar preflight para todas las rutas
 app.use(cors(corsOptions));
 // app.options('*', cors(corsOptions));
 app.use(express.json());
